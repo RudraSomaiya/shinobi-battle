@@ -82,15 +82,24 @@ npm run dev
 3. Complete calibration
 4. Battle!
 
+### 7. Multiplayer
+
+To play multiplayer, simply expose the URL to cloudflare or Ngrok and share the link
+eg: 
+
+```
+cloudflared tunnel --url http://localhost:5173
+```
+
 ## Gameplay
 
 - **Turn-based**: Only the active player can perform actions
 - **Hand signs**: Perform real hand signs in front of your webcam
 - **Buffer**: Build a sequence of up to 6 signs
-- **Ram (🐏)**: Activate your sign sequence → execute jutsu
-- **Scrap (❌)**: Clear buffer without ending turn
-- **Shadow Clone (👥)**: Immediate, bypasses buffer
-- **Focus (🧘)**: Activate with empty buffer → gain +20 chakra
+- **Ram**: Activate your sign sequence → execute jutsu
+- **Scrap**: Clear buffer without ending turn
+- **Shadow Clone**: Immediate, bypasses buffer
+- **Focus**: Activate with empty buffer → gain +20 chakra
 - **Passive regen**: +10 chakra per turn
 
 ## Configuration
