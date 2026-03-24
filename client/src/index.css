@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+/* ========================================
+   Naruto Battle — Design System
+   ======================================== */
+
+@theme {
+  --color-naruto-orange: #ff6b00;
+  --color-naruto-orange-light: #ff9a45;
+  --color-naruto-red: #dc2626;
+  --color-naruto-red-dark: #991b1b;
+  --color-naruto-blue: #3b82f6;
+  --color-naruto-blue-dark: #1e40af;
+  --color-naruto-purple: #8b5cf6;
+  --color-chakra-blue: #38bdf8;
+  --color-chakra-glow: #67e8f9;
+  --color-hp-green: #22c55e;
+  --color-hp-yellow: #eab308;
+  --color-hp-red: #ef4444;
+  --color-surface: #0f0f1a;
+  --color-surface-light: #1a1a2e;
+  --color-surface-card: #16213e;
+  --color-surface-overlay: rgba(15, 15, 26, 0.85);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-glow: rgba(255, 107, 0, 0.4);
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  --font-heading: 'Rajdhani', 'Inter', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+/* ---- Globals ---- */
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: 3px;
+}
+
+/* ---- Animations ---- */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 0, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(255, 107, 0, 0.6); }
+}
+
+@keyframes chakra-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes sign-lock {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+.animate-chakra-flow {
+  background-size: 200% 200%;
+  animation: chakra-flow 3s ease infinite;
+}
+.animate-sign-lock {
+  animation: sign-lock 0.4s ease-out forwards;
+}
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
+}
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* ---- Glass Card ---- */
+.glass-card {
+  background: linear-gradient(135deg, rgba(22, 33, 62, 0.8), rgba(26, 26, 46, 0.6));
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 12px;
+}
+
+/* ---- HP/Chakra Bar Base ---- */
+.bar-track {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 999px;
+  overflow: hidden;
+  height: 16px;
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+}
+.bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+  border-radius: 999px;
+}
+
+/* ---- Buffer Sign Slot ---- */
+.sign-slot {
+  width: 52px;
+  height: 52px;
+  border: 2px solid var(--color-border-subtle);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.sign-slot.filled {
+  border-color: var(--color-naruto-orange);
+  background: rgba(255, 107, 0, 0.15);
+  color: var(--color-naruto-orange-light);
+}
+
+/* ---- Turn Indicator ---- */
+.turn-active {
+  border: 2px solid var(--color-naruto-orange);
+  box-shadow: 0 0 15px rgba(255, 107, 0, 0.3);
+}
+
+/* ---- Buff/Debuff Chips ---- */
+.buff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.buff-chip.positive {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.buff-chip.negative {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
