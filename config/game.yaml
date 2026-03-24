@@ -1,0 +1,223 @@
+# ============================================================
+# Shinobi Battle — Game Configuration
+# ============================================================
+# All gameplay balance values. Edit freely to tune the game.
+
+# --- General Balance ---
+passive_regen: 10          # Chakra restored at end of every turn
+focus_bonus: 20            # Extra chakra from Focus (total = passive + focus)
+base_penalty: 5            # Base chakra penalty for failed jutsu
+per_sign_penalty: 2        # Additional penalty per sign in failed sequence
+max_buffer_length: 6       # Max signs before forced Activate/Scrap
+max_buffs: 2               # Max simultaneous buffs per player
+max_debuffs: 2             # Max simultaneous debuffs per player
+
+# --- Player Defaults ---
+player:
+  max_hp: 100
+  max_chakra: 100
+  starting_hp: 100
+  starting_chakra: 100
+
+# --- Shadow Clone ---
+shadow_clone:
+  chakra_cost_percent: 50        # Costs 50% of current chakra
+  miss_increase_percent: 50      # +50% miss rate on next enemy attack
+  cooldown_turns: 3
+
+# --- Stability Confirmation (CV) ---
+cv:
+  stability_frames: 5            # Consecutive same-class frames to confirm
+  confidence_threshold: 0.70     # Minimum confidence to accept prediction
+
+# --- Sign Classes ---
+# 15 total: 11 jutsu signs + Ram + Scrap + Shadow Clone + Unknown
+sign_classes:
+  - bird
+  - boar
+  - dog
+  - dragon
+  - hare
+  - horse
+  - monkey
+  - ox
+  - rat
+  - serpent
+  - tiger
+  - ram           # Activation sign
+  - scrap         # Clear buffer
+  - shadow_clone  # Unique immediate gesture
+  - unknown       # No valid sign detected
+
+# --- Jutsu Definitions ---
+# Each jutsu: name, sign_sequence, type, dmg_to_enemy, dmg_to_self,
+#   chakra_cost_self, chakra_cost_enemy, miss_rate, buff, debuff, cooldown_turns
+jutsu:
+  # --- 2-sign jutsu (fast, low cost) ---
+  - name: "Wind Scythe"
+    sign_sequence: [bird, tiger]
+    type: attack
+    dmg_to_enemy: 100
+    dmg_to_self: 0
+    chakra_cost_self: 10
+    chakra_cost_enemy: 0
+    miss_rate: 0.10
+    buff: null
+    debuff: null
+    cooldown_turns: 1
+
+  - name: "Mud Wall"
+    sign_sequence: [dog, boar]
+    type: defense
+    dmg_to_enemy: 0
+    dmg_to_self: 0
+    chakra_cost_self: 10
+    chakra_cost_enemy: 0
+    miss_rate: 0.05
+    buff:
+      name: "Earth Shield"
+      effect: "reduce_damage"
+      value: 5          # Reduce incoming damage by 5
+      duration: 2       # Lasts 2 turns
+    debuff: null
+    cooldown_turns: 2
+
+  # --- 3-sign jutsu (medium) ---
+  - name: "Lightning Blade"
+    sign_sequence: [ox, hare, monkey]
+    type: attack
+    dmg_to_enemy: 22
+    dmg_to_self: 5
+    chakra_cost_self: 20
+    chakra_cost_enemy: 0
+    miss_rate: 0.15
+    buff: null
+    debuff: null
+    cooldown_turns: 2
+
+  - name: "Phoenix Flower"
+    sign_sequence: [rat, tiger, serpent]
+    type: attack
+    dmg_to_enemy: 18
+    dmg_to_self: 0
+    chakra_cost_self: 15
+    chakra_cost_enemy: 5
+    miss_rate: 0.15
+    buff: null
+    debuff:
+      name: "Burn"
+      effect: "dot"        # Damage over time
+      value: 3             # 3 damage per turn
+      duration: 2
+    cooldown_turns: 2
+
+  - name: "Healing Palm"
+    sign_sequence: [boar, horse, dog]
+    type: heal
+    dmg_to_enemy: 0
+    dmg_to_self: -15       # Negative = healing
+    chakra_cost_self: 20
+    chakra_cost_enemy: 0
+    miss_rate: 0.05
+    buff:
+      name: "Regen"
+      effect: "hot"        # Heal over time
+      value: 3             # 3 HP per turn
+      duration: 2
+    debuff: null
+    cooldown_turns: 3
+
+  # --- 4-sign jutsu (strong) ---
+  - name: "Water Dragon"
+    sign_sequence: [ox, monkey, hare, rat]
+    type: attack
+    dmg_to_enemy: 28
+    dmg_to_self: 0
+    chakra_cost_self: 30
+    chakra_cost_enemy: 0
+    miss_rate: 0.20
+    buff: null
+    debuff:
+      name: "Soak"
+      effect: "increase_damage_taken"
+      value: 5             # Take 5 more damage per hit
+      duration: 2
+    cooldown_turns: 3
+
+  - name: "Genjutsu Bind"
+    sign_sequence: [serpent, rat, bird, ox]
+    type: debuff
+    dmg_to_enemy: 8
+    dmg_to_self: 0
+    chakra_cost_self: 15
+    chakra_cost_enemy: 10
+    miss_rate: 0.20
+    buff: null
+    debuff:
+      name: "Confusion"
+      effect: "increase_miss"
+      value: 20            # +20% miss rate
+      duration: 2
+    cooldown_turns: 3
+
+  # --- 5-sign jutsu (powerful) ---
+  - name: "Fire Dragon Bomb"
+    sign_sequence: [serpent, dragon, hare, tiger, dog]
+    type: attack
+    dmg_to_enemy: 35
+    dmg_to_self: 5
+    chakra_cost_self: 35
+    chakra_cost_enemy: 0
+    miss_rate: 0.25
+    buff: null
+    debuff:
+      name: "Burn"
+      effect: "dot"
+      value: 4
+      duration: 2
+    cooldown_turns: 4
+
+  - name: "Chakra Armor"
+    sign_sequence: [ox, boar, horse, monkey, tiger]
+    type: defense
+    dmg_to_enemy: 0
+    dmg_to_self: 0
+    chakra_cost_self: 25
+    chakra_cost_enemy: 0
+    miss_rate: 0.05
+    buff:
+      name: "Chakra Armor"
+      effect: "reduce_damage"
+      value: 8
+      duration: 3
+    debuff: null
+    cooldown_turns: 4
+
+  # --- 6-sign jutsu (ultimate) ---
+  - name: "Grand Fireball"
+    sign_sequence: [serpent, monkey, boar, horse, tiger, bird]
+    type: attack
+    dmg_to_enemy: 45
+    dmg_to_self: 10
+    chakra_cost_self: 45
+    chakra_cost_enemy: 0
+    miss_rate: 0.30
+    buff: null
+    debuff: null
+    cooldown_turns: 5
+
+  - name: "Forbidden Seal"
+    sign_sequence: [dragon, rat, ox, serpent, bird, hare]
+    type: debuff
+    dmg_to_enemy: 15
+    dmg_to_self: 10
+    chakra_cost_self: 40
+    chakra_cost_enemy: 20
+    miss_rate: 0.25
+    buff: null
+    debuff:
+      name: "Sealed"
+      effect: "chakra_drain"
+      value: 8             # -8 chakra per turn
+      duration: 3
+    cooldown_turns: 5
