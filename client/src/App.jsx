@@ -3,6 +3,7 @@ import { useWebSocket } from './hooks/useWebSocket';
 import { useWebRTC } from './hooks/useWebRTC';
 import { useGameState } from './hooks/useGameState';
 import { useMediaPipe } from './hooks/useMediaPipe';
+import { useAudio } from './hooks/useAudio';
 import { MessageType } from './utils/messageTypes';
 import CalibrationScreen from './components/CalibrationScreen';
 import GameBoard from './components/GameBoard';
@@ -24,9 +25,13 @@ function App() {
     gameState, turnResult, matchStarted, matchEnded, winner,
     error, playersInRoom, actionLog, isMyTurn, myState, opponentState,
     handleMessage: handleGameMessage,
+    cloneConfig,
   } = useGameState(playerId);
 
   const [latestCalibrationSign, setLatestCalibrationSign] = useState(null);
+
+  // Audio manager
+  const audio = useAudio();
 
   // WebSocket message handler
   const onMessage = useCallback((data) => {
@@ -47,12 +52,26 @@ function App() {
       if (data.players[0].id === playerId) {
         setTimeout(() => createOffer(), 500);
       }
+      audio.playTheme();
       setPhase('playing');
       return;
     }
 
+    // Handle match end → play win/loss audio IMPERATIVELY (no React effects)
+    if (data.type === MessageType.MATCH_END) {
+      handleGameMessage(data);
+      audio.forceUnmuteBGM();
+      console.log('[Audio] MATCH_END received. winner:', data.winner, 'me:', playerId, 'iWon:', data.winner === playerId);
+      if (data.winner === playerId) {
+        audio.playWin();
+      } else {
+        audio.playLoss();
+      }
+      return;
+    }
+
     handleGameMessage(data);
-  }, [playerId, handleGameMessage]);
+  }, [playerId, handleGameMessage, audio]);
 
   // WebSocket
   const { send, connected } = useWebSocket(onMessage);
@@ -93,9 +112,10 @@ function App() {
   // Auto-transition to playing when match starts during calibration
   useEffect(() => {
     if (matchStarted && phase === 'calibrating') {
+      audio.playTheme();
       setPhase('playing');
     }
-  }, [matchStarted, phase]);
+  }, [matchStarted, phase, audio]);
 
   const [hiddenVideoEl, setHiddenVideoEl] = useState(null);
   const [latestLandmarks, setLatestLandmarks] = useState([]);
@@ -121,6 +141,26 @@ function App() {
   // ---- Render Strategy ----
   return (
     <>
+      {/* Global Audio Controls */}
+      <div className="fixed top-4 right-4 z-[100] flex items-center gap-3 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+        <button
+          onClick={audio.toggleMute}
+          className="text-xl hover:scale-110 active:scale-95 transition-transform"
+          title={audio.isMuted ? "Unmute" : "Mute"}
+        >
+          {audio.isMuted ? '🔇' : '🔊'}
+        </button>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.05"
+          value={audio.volume}
+          onChange={(e) => audio.changeVolume(parseFloat(e.target.value))}
+          className="w-24 accent-[var(--color-naruto-orange)]"
+        />
+      </div>
+
       {/* Hidden tracker for background MediaPipe processing */}
       <video
         ref={setHiddenVideoEl}
@@ -247,6 +287,9 @@ function App() {
           playerId={playerId}
           latestLandmarks={latestLandmarks}
           matchEnded={matchEnded}
+          audio={audio}
+          winner={winner}
+          cloneConfig={cloneConfig}
         />
       )}
     </>
