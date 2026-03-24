@@ -24,6 +24,12 @@ shadow_clone:
   chakra_cost_percent: 50        # Costs 50% of current chakra
   miss_increase_percent: 50      # +50% miss rate on next enemy attack
   cooldown_turns: 3
+  visual:
+    offsetX: 15                  # Shift % (translateX)
+    scale: 0.85                  # Size scale (0.0 to 1.0)
+    opacity: 0.5                 # Opacity strength
+    blur: 1                      # Blur px
+    hue_rotate: 180              # Hue shift degrees
 
 # --- Stability Confirmation (CV) ---
 cv:
@@ -83,17 +89,6 @@ jutsu:
     cooldown_turns: 2
 
   # --- 3-sign jutsu (medium) ---
-  - name: "Lightning Blade"
-    sign_sequence: [ox, hare, monkey]
-    type: attack
-    dmg_to_enemy: 22
-    dmg_to_self: 5
-    chakra_cost_self: 20
-    chakra_cost_enemy: 0
-    miss_rate: 0.15
-    buff: null
-    debuff: null
-    cooldown_turns: 2
 
   - name: "Phoenix Flower"
     sign_sequence: [rat, tiger, serpent]
@@ -221,3 +216,27 @@ jutsu:
       value: 8             # -8 chakra per turn
       duration: 3
     cooldown_turns: 5
+
+  - name: "Chidori"
+    sign_sequence: [ox, horse, hare, horse, serpent, monkey]
+    type: attack
+    dmg_to_enemy: 45
+    dmg_to_self: 5
+    chakra_cost_self: 30
+    chakra_cost_enemy: 0
+    miss_rate: 0.10
+    buff: null
+    debuff: null
+    cooldown_turns: 3
+
+  - name: "Rasengan"
+    sign_sequence: [dog, dragon, tiger, monkey, boar, dog]
+    type: attack
+    dmg_to_enemy: 45
+    dmg_to_self: 5
+    chakra_cost_self: 30
+    chakra_cost_enemy: 0
+    miss_rate: 0.20
+    buff: null
+    debuff: null
+    cooldown_turns: 3

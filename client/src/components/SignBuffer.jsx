@@ -6,12 +6,10 @@ import { SIGN_EMOJIS } from '../utils/constants';
  * Only visible to the active player.
  */
 export default function SignBuffer({ buffer, maxLength = 6, visible = false }) {
-  if (!visible) return null;
-
   const slots = Array.from({ length: maxLength }, (_, i) => buffer?.[i] || null);
 
   return (
-    <div className="glass-card p-4">
+    <div className={`glass-card p-4 transition-all duration-300 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none select-none'}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
           Sign Buffer

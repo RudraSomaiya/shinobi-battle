@@ -24,9 +24,19 @@ export default function GameBoard({
   playerId,
   latestLandmarks,
   matchEnded,
+  audio,
+  winner,
+  cloneConfig,
 }) {
   const [overlayOptions, setOverlayOptions] = useState({ landmarks: true, boundingBoxes: true, confidence: true });
   const [showGameOver, setShowGameOver] = useState(false);
+
+  const visual = cloneConfig?.visual;
+  const offsetX = visual?.offsetX ?? 15;
+  const scale = visual?.scale ?? 0.85;
+  const opacity = visual?.opacity ?? 0.5;
+  const blur = visual?.blur ?? 1;
+  const hueRotate = visual?.hue_rotate ?? 180;
 
   // Delay Game Over Overlay so damage numbers & HP bars finish animating visually
   useEffect(() => {
@@ -37,6 +47,26 @@ export default function GameBoard({
       setShowGameOver(false);
     }
   }, [matchEnded]);
+
+  // Handle SFX on actions
+  useEffect(() => {
+    if (!turnResult || !audio) return;
+    
+    const action = turnResult.action;
+    const jutsuName = turnResult.jutsu_name || '';
+
+    if (action === 'shadow_clone') {
+      audio.playShadowClone();
+    } else if (action === 'jutsu') {
+      if (jutsuName === 'Rasengan') audio.playRasengan();
+      else if (jutsuName === 'Chidori') audio.playChidori();
+      else audio.playJutsuActivation();
+    } else if (['focus', 'failed_sequence', 'cooldown_blocked'].includes(action)) {
+      audio.playJutsuActivation();
+    }
+  }, [turnResult, audio]);
+
+  // Win/Loss audio is now handled imperatively in App.jsx onMessage
 
   const activePlayerName = gameState?.active_player_id === myState?.player_id
     ? myState?.name
@@ -60,18 +90,26 @@ export default function GameBoard({
       <div className="flex-1 flex gap-4 p-4 min-h-0">
         
         {/* Center/Main Column: Camera Feeds + Buffer */}
-        <div className="flex-1 flex flex-col gap-3 min-h-0">
+        <div className="flex-1 flex flex-col gap-3 min-h-0 relative">
           {/* Camera feeds side by side with panels beneath them */}
           <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
             {/* My Side */}
-            <div className="flex flex-col gap-3 min-h-0">
+            <div className="flex flex-col gap-3 min-h-0 relative">
               <div className="flex-1 min-h-0 relative rounded-2xl overflow-hidden glass-card border border-white/5">
+                {myState?.shadow_clone_active && (
+                  <div className="absolute top-2 left-2 bg-indigo-500/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-semibold shadow-lg z-30">
+                    Shadow Clone Active
+                  </div>
+                )}
+                
                 <CameraFeed
                   stream={localStream}
                   label={`${myState?.name || 'You'} (You)`}
                   mirrored={true}
                   overlayOptions={overlayOptions}
                   latestLandmarks={latestLandmarks}
+                  cutout={myState?.shadow_clone_active}
+                  multiClone={myState?.shadow_clone_active}
                 />
               </div>
               <PlayerPanel
@@ -82,11 +120,19 @@ export default function GameBoard({
             </div>
 
             {/* Opponent Side */}
-            <div className="flex flex-col gap-3 min-h-0">
+            <div className="flex flex-col gap-3 min-h-0 relative">
               <div className="flex-1 min-h-0 relative rounded-2xl overflow-hidden glass-card border border-white/5">
+                {opponentState?.shadow_clone_active && (
+                  <div className="absolute top-2 left-2 bg-indigo-500/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-semibold shadow-lg z-30">
+                    Shadow Clone Active
+                  </div>
+                )}
+
                 <CameraFeed
                   stream={remoteStream}
                   label={opponentState?.name || 'Opponent'}
+                  cutout={opponentState?.shadow_clone_active}
+                  multiClone={opponentState?.shadow_clone_active}
                 />
               </div>
               <PlayerPanel
@@ -96,15 +142,6 @@ export default function GameBoard({
               />
             </div>
           </div>
-
-          {/* Sign Buffer (Controlled in size) */}
-          <div className="flex-shrink-0">
-            <SignBuffer
-              buffer={gameState?.buffer}
-              maxLength={6}
-              visible={isMyTurn}
-            />
-          </div>
         </div >
 
         {/* Right Sidebar: Action Log + Toggles (Takes ~20% space) */}
@@ -112,6 +149,16 @@ export default function GameBoard({
           <div className="flex-1 min-h-0 overflow-hidden">
             <ActionLog log={actionLog} />
           </div>
+
+          {/* Sign Buffer inside Sidebar */}
+          <div className="flex-shrink-0">
+            <SignBuffer
+              buffer={gameState?.buffer}
+              maxLength={6}
+              visible={isMyTurn}
+            />
+          </div>
+
           <OverlayToggle onToggle={setOverlayOptions} />
         </div>
       </div>

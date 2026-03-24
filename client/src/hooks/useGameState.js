@@ -15,6 +15,8 @@ export function useGameState(playerId) {
   const [playersInRoom, setPlayersInRoom] = useState(0);
   const [actionLog, setActionLog] = useState([]);
 
+  const [cloneConfig, setCloneConfig] = useState(null);
+
   const addToLog = useCallback((entry) => {
     setActionLog((prev) => [entry, ...prev].slice(0, 20));
   }, []);
@@ -33,6 +35,9 @@ export function useGameState(playerId) {
 
       case MessageType.GAME_STATE_UPDATE:
         setGameState(data.state);
+        if (data.config) {
+          setCloneConfig(data.config);
+        }
         setError(null);
         break;
 
@@ -107,5 +112,6 @@ export function useGameState(playerId) {
     myState,
     opponentState,
     handleMessage,
+    cloneConfig,
   };
 }
