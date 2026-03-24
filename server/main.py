@@ -80,7 +80,11 @@ class Room:
         """Send personalized game state to each player (private buffer)."""
         for p in self.players:
             state = self.game.to_dict(for_player_id=p["id"])
-            msg = {"type": MessageType.GAME_STATE_UPDATE, "state": state}
+            msg = {
+                "type": MessageType.GAME_STATE_UPDATE, 
+                "state": state,
+                "config": self.engine.config.get("shadow_clone", {})
+            }
             try:
                 await p["ws"].send(json.dumps(msg))
             except websockets.ConnectionClosed:

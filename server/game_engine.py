@@ -179,11 +179,12 @@ class GameEngine:
         player.shadow_clone_active = True
 
         # Apply debuff to enemy: +50% miss on their next attack
+        # duration=99 ensures it does not naturally expire until they use an offensive jutsu
         miss_debuff = Debuff(
             name="Shadow Clone Confusion",
             effect="increase_miss",
             value=self.shadow_clone_cfg["miss_increase_percent"],
-            duration=1,  # Only their next turn
+            duration=99,
         )
         self._add_debuff(enemy, miss_debuff)
 
@@ -269,6 +270,13 @@ class GameEngine:
             "player_id": player.player_id,
             "details": {},
         }
+
+        # --- Shadow Clone dispel mechanic ---
+        if jutsu["type"] in ("attack", "debuff"):
+            # If the current player (who is acting) uses an offensive move, 
+            # it targets the enemy and dissipates the enemy's shadow clone.
+            player.debuffs = [d for d in player.debuffs if d.name != "Shadow Clone Confusion"]
+            enemy.shadow_clone_active = False
 
         if missed:
             result["details"]["message"] = f"{jutsu['name']} missed!"
@@ -374,9 +382,8 @@ class GameEngine:
 
         # --- Tick cooldowns ---
         self._tick_cooldowns(player)
-
-        # --- Reset shadow clone flag ---
-        player.shadow_clone_active = False
+        # NOTE: shadow_clone_active is NOT reset here.
+        # It persists until the enemy uses an offensive jutsu (handled in _resolve_jutsu).
 
         # --- Check game over ---
         gs.check_game_over()
