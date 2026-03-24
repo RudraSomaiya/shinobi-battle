@@ -59,13 +59,26 @@ sign_classes:
 # Each jutsu: name, sign_sequence, type, dmg_to_enemy, dmg_to_self,
 #   chakra_cost_self, chakra_cost_enemy, miss_rate, buff, debuff, cooldown_turns
 jutsu:
+
+  - name: "Slap"
+    sign_sequence: [horse]
+    type: attack
+    dmg_to_enemy: 100
+    dmg_to_self: 0
+    chakra_cost_self: 20
+    chakra_cost_enemy: 0
+    miss_rate: 0.20
+    buff: null
+    debuff: null
+    cooldown_turns: 1
+
   # --- 2-sign jutsu (fast, low cost) ---
   - name: "Wind Scythe"
     sign_sequence: [bird, tiger]
     type: attack
-    dmg_to_enemy: 100
+    dmg_to_enemy: 20
     dmg_to_self: 0
-    chakra_cost_self: 10
+    chakra_cost_self: 15
     chakra_cost_enemy: 0
     miss_rate: 0.10
     buff: null
@@ -95,7 +108,7 @@ jutsu:
     type: attack
     dmg_to_enemy: 18
     dmg_to_self: 0
-    chakra_cost_self: 15
+    chakra_cost_self: 30
     chakra_cost_enemy: 5
     miss_rate: 0.15
     buff: null
@@ -111,7 +124,7 @@ jutsu:
     type: heal
     dmg_to_enemy: 0
     dmg_to_self: -15       # Negative = healing
-    chakra_cost_self: 20
+    chakra_cost_self: 30
     chakra_cost_enemy: 0
     miss_rate: 0.05
     buff:
